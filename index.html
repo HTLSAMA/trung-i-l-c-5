@@ -6,12 +6,12 @@
 <style>
   body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; user-select: none; }
   canvas#view { display: block; width: 100vw; height: 100vh; cursor: crosshair; }
-  #hud { position: fixed; top: 15px; left: 15px; color: #fff; background: rgba(15,23,42,0.8); padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.7; pointer-events: none; border: 1px solid rgba(255,255,255,0.2); }
-  #crosshair { position: fixed; top: 50%; left: 50%; width: 16px; height: 16px; transform: translate(-50%,-50%); pointer-events: none; }
+  #hud { position: fixed; top: 15px; left: 15px; color: #fff; background: rgba(15,23,42,0.85); padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.7; pointer-events: none; border: 1px solid rgba(255,255,255,0.2); z-index: 10; }
+  #crosshair { position: fixed; top: 50%; left: 50%; width: 16px; height: 16px; transform: translate(-50%,-50%); pointer-events: none; z-index: 10; }
   #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #ffcc00; }
   #crosshair::before { top: 7px; left: 0; width: 16px; height: 2px; }
   #crosshair::after { left: 7px; top: 0; width: 2px; height: 16px; }
-  #minimap { position: fixed; bottom: 15px; right: 15px; border: 2px solid #fff; border-radius: 8px; background: rgba(0,0,0,0.7); }
+  #minimap { position: fixed; bottom: 15px; right: 15px; border: 2px solid #fff; border-radius: 8px; background: rgba(0,0,0,0.8); z-index: 10; }
   #winScreen { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; flex-direction: column; color: #fff; z-index: 50; }
   #winScreen button { margin-top: 15px; padding: 12px 30px; font-size: 16px; background: #ffcc00; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; }
 </style>
@@ -24,7 +24,7 @@
   <div style="font-size:12px;color:#cbd5e1">WASD: Đi | Chuột / ◄►: Xoay | Click trái / Space: Chém | E: Gọi lính</div>
 </div>
 <div id="crosshair"></div>
-<canvas id="minimap" width="160" height="160"></canvas>
+<canvas id="minimap" width="160" height="120"></canvas>
 <div id="winScreen"><h1 id="winText"></h1><button onclick="location.reload()">CHƠI LẠI</button></div>
 <canvas id="view"></canvas>
 <script>
@@ -33,20 +33,21 @@ const mCtx = document.getElementById('minimap').getContext('2d');
 function resize() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
 window.addEventListener('resize', resize); resize();
 
-// Bản đồ 3D 16x16 (1: Tường đá, 2: Nhà chính Đỏ, 3: Nhà chính Xanh, 0: Đường đi & Cầu)
-const MAP = [,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+const RAW_MAP = [
+  "1111111111111111",
+  "1000000110000001",
+  "1020000000000301",
+  "1000000110000001",
+  "1000110110110001",
+  "1000000000000001",
+  "1000000000000001",
+  "1000110110110001",
+  "1000000110000001",
+  "1000000000000001",
+  "1000000110000001",
+  "1111111111111111"
 ];
+const MAP = RAW_MAP.map(row => row.split('').map(Number));
 const MW = 16, MH = 12;
 const player = { x: 3.5, y: 2.5, dir: 0, hp: 300, maxHp: 300, swing: 0, cd: 0 };
 const bases = { red: { x: 2.5, y: 2.5, hp: 1000 }, blue: { x: 13.5, y: 2.5, hp: 1000 } };
